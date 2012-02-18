@@ -88,3 +88,17 @@ var search_at_who_async = eval(Jscex.compile("async", function (str) {
         return user_ctrl.get_user_by_loginname_async(loginname);
     })));
 }));
+
+var link_at_who_async = eval(Jscex.compile("async", function (str) {
+    var users = $await(search_at_who_async(str));
+    _.each(users, function (u) {
+        var name = u.name;
+        str = str.replace(
+            new RegExp( '@' + name, 'gmi'),
+            '@<a href="/user/' + name+ '">' + name + '</a>');
+    });
+    
+    return str;
+}));
+
+exports.link_at_who_async = link_at_who_async;
