@@ -70,6 +70,7 @@ exports.link_at_who = link_at_who;
 
 /******** Jscex ***********/
 var Jscex = require("../libs/jscex").Jscex;
+var Task = Jscex.Async.Task;
 var _ = require("underscore");
 
 var search_at_who_async = eval(Jscex.compile("async", function (str) {
@@ -82,12 +83,8 @@ var search_at_who_async = eval(Jscex.compile("async", function (str) {
 	
     if (names.length == 0) return names;
 
-    var users = [];
-    for (var i = 0; i < names.length; i++) {
-        var loginname = names[i].toLowerCase();
-        var user = $await(user_ctrl.get_user_by_loginname_async(loginname));
-        users.push(user);
-    }
-    
-    return users;
+    return $await(Task.whenAll(_.map(names, function (n) {
+        var loginname = n.toLowerCase();
+        return user_ctrl.get_user_by_loginname_async(loginname);
+    })));
 }));
