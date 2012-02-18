@@ -503,3 +503,12 @@ exports.get_user_by_name = get_user_by_name;
 exports.get_user_by_loginname = get_user_by_loginname;
 exports.get_users_by_ids = get_users_by_ids;
 exports.get_users_by_query = get_users_by_query;
+
+/******** Jscex ***********/
+var Jscex = require("../libs/jscex").Jscex;
+
+var get_user_by_id_async = eval(Jscex.compile("async", function (id) {
+    return $await(User.findOneAsync({_id: id}));
+}));
+
+exports.get_user_by_id_async = get_user_by_id_async;
