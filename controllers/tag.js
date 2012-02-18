@@ -325,4 +325,9 @@ var get_all_tags_async = eval(Jscex.compile("async", function () {
     return $await(Tag.findAsync({}, [], {sort: [['order','asc']]}));
 }));
 
+var get_tags_by_ids_async = eval(Jscex.compile("async", function (ids) {
+    return $await(Tag.findAsync({ _id: { "$in": ids } }));
+}));
+
 exports.get_all_tags_async = get_all_tags_async;
+exports.get_tags_by_ids_async = get_tags_by_ids_async;
