@@ -67,3 +67,27 @@ function link_at_who(str,cb){
 
 exports.send_at_message = send_at_message;
 exports.link_at_who = link_at_who;
+
+/******** Jscex ***********/
+var Jscex = require("../libs/jscex").Jscex;
+var _ = require("underscore");
+
+var search_at_who_async = eval(Jscex.compile("async", function (str) {
+	var pattern = /@[a-zA-Z0-9]+/ig;
+	var results = str.match(pattern);
+	var names = !results ? [] : _.map(results, function (s) {
+        //remove leading "@"
+        return s.slice(1);
+    });
+	
+    if (names.length == 0) return names;
+
+    var users = [];
+    for (var i = 0; i < names.length; i++) {
+        var loginname = names[i].toLowerCase();
+        var user = $await(user_ctrl.get_user_by_loginname_async(loginname));
+        users.push(user);
+    }
+    
+    return users;
+}));
