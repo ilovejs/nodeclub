@@ -317,3 +317,12 @@ exports.get_tag_by_name = get_tag_by_name;
 exports.get_tag_by_id = get_tag_by_id;
 exports.get_tags_by_ids = get_tags_by_ids;
 exports.get_tags_by_query = get_tags_by_query;
+
+/******** Jscex ***********/
+var Jscex = require("../libs/jscex").Jscex;
+
+var get_all_tags_async = eval(Jscex.compile("async", function () {
+    return $await(Tag.findAsync({}, [], {sort: [['order','asc']]}));
+}));
+
+exports.get_all_tags_async = get_all_tags_async;
