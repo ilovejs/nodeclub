@@ -569,28 +569,34 @@ exports.get_count_by_query = get_count_by_query;
 
 /********** Jscex ************/
 var Jscex = require("../libs/jscex").Jscex;
+var Task = Jscex.Async.Task;
 var _ = require("underscore");
 
 var get_topic_by_id_async = eval(Jscex.compile("async", function (id) {
     var topic = $await(Topic.findOneAsync({_id: id}));
     if (!topic) return { };
     
-    var topic_tags = $await(TopicTag.findAsync({topic_id: topic._id}));
-    var tag_ids = _.map(topic_tags, function (t) { return t.tag_id; });
-    var tags = $await(tag_ctrl.get_tags_by_ids_async(tag_ids));
+    var resultTasks = {
+        author: user_ctrl.get_user_by_id_async(topic.author_id),
+        tags: TopicTag.findAsync({topic_id: topic._id}).then(
+            function (topic_tags) {
+                var tag_ids = _.map(topic_tags, function (t) {
+                    return t.tag_id;
+                });
+                
+                return tag_ctrl.get_tags_by_ids_async(tag_ids);
+            }
+        )
+    };
     
-    var author = $await(user_ctrl.get_user_by_id_async(topic.author_id));
-    var last_reply;
     if (topic.last_reply) {
-        last_reply = $await(reply_ctrl.get_reply_by_id_async(topic.last_reply));
+        resultTasks.last_reply = reply_ctrl.get_reply_by_id_async(topic.last_reply);
     }
     
-    return {
-        topic: topic,
-        author: author,
-        tags: tags,
-        last_reply: last_reply
-    };
+    var result = $await(Task.whenAll(resultTasks));
+    result.topic = topic;
+    
+    return result;
 }));
 
 exports.get_topic_by_id_async = get_topic_by_id_async;
