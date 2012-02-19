@@ -226,3 +226,24 @@ function get_replies_by_topic_id(id,cb){
 };
 exports.get_reply_by_id = get_reply_by_id;
 exports.get_replies_by_topic_id = get_replies_by_topic_id;	
+
+/******** Jscex ***********/
+var Jscex = require("../libs/jscex").Jscex;
+
+var get_reply_by_id_async = eval(Jscex.compile("async", function (id) {
+    var reply = $await(Reply.findOneAsync({ _id: id }));
+    if (!reply) return null;
+    
+    reply.author = $await(user_ctrl.get_user_by_id_async(reply.author_id));
+    reply.friendly_create_at = Util.format_date(reply.create_at,true);
+    
+    if (!reply.content_is_html) {
+        reply.content = Markdown(reply.content, true);
+    }
+    
+    reply.content = $await(at_ctrl.link_at_who_async(reply.content));
+
+    return reply;
+}));
+
+exports.get_reply_by_id_async = get_reply_by_id_async;
