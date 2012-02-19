@@ -71,3 +71,72 @@ exports.index = function(req,res,next){
 		proxy.trigger('pages',pages);
 	});
 };
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var Unjscexify = Jscex.Unjscexify;
+var _ = require("underscore");
+
+var indexAsync = eval(Jscex.compile("async", function (req, res) {
+    var page = Number(req.query.page) || 1;
+    var limit = config.list_topic_count;
+
+    var tags = $await(tag_ctrl.get_all_tags_async());
+    
+    var topics = $await(topic_ctrl.get_topics_by_query_async({}, {
+        skip: (page - 1) * limit,
+        limit: limit,
+        sort: [['last_reply_at', 'desc']]
+    }));
+    
+    var hot_topics = $await(topic_ctrl.get_topics_by_query_async({}, {
+        limit: 5,
+        sort: [['visit_count','desc']]
+    }));
+    
+    var stars = $await(user_ctrl.get_users_by_query_async(
+        { is_star: true },
+        { limit: 5 }
+    ));
+    
+    var tops = $await(user_ctrl.get_users_by_query_async({}, {
+        limit: 10,
+        sort: [['score','desc']]
+    }));
+    
+    var no_reply_topics = $await(topic_ctrl.get_topics_by_query_async(
+        { reply_count: 0 },
+        { limit: 5, sort: [['create_at','desc']] }
+    ));
+    
+    var all_topics_count = $await(topic_ctrl.get_count_by_query_async({}));
+    var pages = Math.ceil(all_topics_count / limit);
+    
+    var all_tags = tags.slice(0);
+
+    // 计算最热标签
+    var hot_tags = _.chain(tags)
+        .sortBy(function (t) { return -t.topic_count; })
+        .first(5);
+
+    // 计算最新标签
+    var recent_tags = _.chain(tags)
+        .sortBy(function (t) { return -t.create_at.valueOf() })
+        .first(5);
+
+	res.render('index', {
+        tags: all_tags,
+        topics: topics,
+        current_page: page,
+        list_topic_count: limit,
+        hot_tags: hot_tags,
+        recent_tags: recent_tags,
+        hot_topics: hot_topics,
+        stars: stars,
+        tops: tops,
+        no_reply_topics: no_reply_topics,
+        pages: pages
+    });
+}));
+
+exports.index = Unjscexify.toRequestHandler(indexAsync);

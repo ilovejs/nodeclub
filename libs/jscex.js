@@ -17,4 +17,14 @@ m.findOneAsync = Jscexify.fromStandard(m.findOne);
 m.findAsync = Jscexify.fromStandard(m.find);
 m.countAsync = Jscexify.fromStandard(m.count);
 
+Jscex.Unjscexify = {
+    toRequestHandler: function (fn) {
+        return function (req, res, next) {
+            fn(req, res).addEventListener("failure", function () {
+                next(this.error);
+            }).start();
+        }
+    }
+}
+
 exports.Jscex = Jscex;
