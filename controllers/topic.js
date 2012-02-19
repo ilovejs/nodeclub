@@ -566,3 +566,31 @@ exports.get_topic_by_id = get_topic_by_id;
 exports.get_full_topic = get_full_topic;
 exports.get_topics_by_query = get_topics_by_query;
 exports.get_count_by_query = get_count_by_query;
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var _ = require("underscore");
+
+var get_topic_by_id_async = eval(Jscex.compile("async", function (id) {
+    var topic = $await(Topic.findOneAsync({_id: id}));
+    if (!topic) return { };
+    
+    var topic_tags = $await(TopicTag.findAsync({topic_id: topic._id}));
+    var tag_ids = _.map(topic_tags, function (t) { return t.tag_id; });
+    var tags = $await(tag_ctrl.get_tags_by_ids_async(tag_ids));
+    
+    var author = $await(user_ctrl.get_user_by_id_async(topic.author_id));
+    var last_reply;
+    if (topic.last_reply) {
+        last_reply = $await(reply_ctrl.get_reply_by_id_async(topic.last_reply));
+    }
+    
+    return {
+        topic: topic,
+        author: author,
+        tags: tags,
+        last_reply: last_reply
+    };
+}));
+
+exports.get_topic_by_id_async = get_topic_by_id_async;
