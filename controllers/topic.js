@@ -603,22 +603,19 @@ var get_topics_by_query_async = eval(Jscex.compile("async", function (query, opt
     var docs = $await(Topic.findAsync(query, ["_id"], opt));
     if (docs.length == 0) return [];
     
-    var topic_ids = _.map(docs, function (d) { return d._id; });
+    var dataList = $await(Task.whenAll(_.map(docs, function (d) {
+        return get_topic_by_id_async(d._id);
+    })));
     
-    var topics = [];
-    for (var i = 0; i < topic_ids.length; i++) {
-        var data = $await(get_topic_by_id_async(topic_ids[i]));
-        
+    return _.map(dataList, function (data) {
         var topic = data.topic;
         topic.tags = data.tags;
         topic.author = data.author;
         topic.reply = data.last_reply;
         topic.friendly_create_at = Util.format_date(topic.create_at, true);
         
-        topics.push(topic);
-    }
-    
-    return topics;
+        return topic;
+    });
 }));
 
 exports.get_topic_by_id_async = get_topic_by_id_async;
