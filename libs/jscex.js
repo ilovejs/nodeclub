@@ -15,5 +15,6 @@ var m = mongoose.Model;
 m.findByIdAsync = Jscexify.fromStandard(m.findById);
 m.findOneAsync = Jscexify.fromStandard(m.findOne);
 m.findAsync = Jscexify.fromStandard(m.find);
+m.countAsync = Jscexify.fromStandard(m.count);
 
 exports.Jscex = Jscex;

@@ -618,5 +618,10 @@ var get_topics_by_query_async = eval(Jscex.compile("async", function (query, opt
     });
 }));
 
+var get_count_by_query_async = eval(Jscex.compile("async", function (query) {
+    return $await(Topic.countAsync(query));
+}));
+
 exports.get_topic_by_id_async = get_topic_by_id_async;
 exports.get_topics_by_query_async = get_topics_by_query_async;
+exports.get_count_by_query_async = get_count_by_query_async;
