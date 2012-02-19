@@ -515,5 +515,10 @@ var get_user_by_loginname_async = eval(Jscex.compile("async", function (name) {
     return $await(User.findOneAsync({ loginname: name }));
 }));
 
+var get_users_by_query_async = eval(Jscex.compile("async", function (query, opt) {
+    return $await(User.findAsync(query, [], opt));
+}));
+
 exports.get_user_by_id_async = get_user_by_id_async;
 exports.get_user_by_loginname_async = get_user_by_loginname_async;
+exports.get_users_by_query_async = get_users_by_query_async
