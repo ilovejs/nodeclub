@@ -508,11 +508,19 @@ exports.get_users_by_query = get_users_by_query;
 var Jscex = require("../libs/jscex").Jscex;
 
 var get_user_by_id_async = eval(Jscex.compile("async", function (id) {
-    return $await(User.findOneAsync({_id: id}));
+    return $await(User.findOneAsync({ _id: id }));
+}));
+
+var get_user_by_name_async = eval(Jscex.compile("async", function (name) {
+    return $await(User.findOneAsync({ name: name }));
 }));
 
 var get_user_by_loginname_async = eval(Jscex.compile("async", function (name) {
     return $await(User.findOneAsync({ loginname: name }));
+}));
+
+var get_users_by_ids_async = eval(Jscex.compile("async", function (ids) {
+    return $await(User.findAsync({ '_id': { '$in': ids } }));
 }));
 
 var get_users_by_query_async = eval(Jscex.compile("async", function (query, opt) {
@@ -520,5 +528,7 @@ var get_users_by_query_async = eval(Jscex.compile("async", function (query, opt)
 }));
 
 exports.get_user_by_id_async = get_user_by_id_async;
+exports.get_user_by_name_async = get_user_by_name_async;
 exports.get_user_by_loginname_async = get_user_by_loginname_async;
-exports.get_users_by_query_async = get_users_by_query_async
+exports.get_users_by_ids_async = get_users_by_ids_async;
+exports.get_users_by_query_async = get_users_by_query_async;
