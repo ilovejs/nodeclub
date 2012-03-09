@@ -317,3 +317,9 @@ exports.get_tag_by_name = get_tag_by_name;
 exports.get_tag_by_id = get_tag_by_id;
 exports.get_tags_by_ids = get_tags_by_ids;
 exports.get_tags_by_query = get_tags_by_query;
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var Jscexify = Jscex.Async.Jscexify;
+
+exports.get_all_tags_async = Jscexify.fromStandard(get_all_tags);

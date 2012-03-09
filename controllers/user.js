@@ -545,3 +545,9 @@ exports.get_user_by_name_async = get_user_by_name_async;
 exports.get_user_by_loginname_async = get_user_by_loginname_async;
 exports.get_users_by_ids_async = get_users_by_ids_async;
 exports.get_users_by_query_async = get_users_by_query_async;
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var Jscexify = Jscex.Async.Jscexify;
+
+exports.get_users_by_query_async = Jscexify.fromStandard(get_users_by_query);
