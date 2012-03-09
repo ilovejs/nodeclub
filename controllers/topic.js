@@ -596,3 +596,10 @@ exports.get_topic_by_id = get_topic_by_id;
 exports.get_full_topic = get_full_topic;
 exports.get_topics_by_query = get_topics_by_query;
 exports.get_count_by_query = get_count_by_query;
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var Jscexify = Jscex.Async.Jscexify;
+
+exports.get_topics_by_query_async = Jscexify.fromStandard(get_topics_by_query);
+exports.get_count_by_query_async = Jscexify.fromStandard(get_count_by_query);
