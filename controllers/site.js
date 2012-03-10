@@ -83,33 +83,33 @@ var indexAsync = eval(Jscex.compile("async", function (req, res) {
     var limit = config.list_topic_count;
     
     var data = $await(Task.whenAll({
-    	topics: topic_ctrl.get_topics_by_query_async({ }, {
-	    	skip: (page - 1) * limit,
-	        limit: limit,
-	        sort: [['last_reply_at', 'desc']]
-	    }),
-	    hot_topics: topic_ctrl.get_topics_by_query_async({ }, {
-	        limit: 5,
-	        sort: [['visit_count','desc']]
-	    }),
-	    stars: user_ctrl.get_users_by_query_async(
-	        { is_star: true },
-	        { limit: 5 }
-	    ),
-	    tops: user_ctrl.get_users_by_query_async({ }, {
-	        limit: 10,
-	        sort: [['score','desc']]
-	    }),
-	    no_reply_topics: topic_ctrl.get_topics_by_query_async(
-	        { reply_count: 0 },
-	        { limit: 5, sort: [['create_at','desc']] }
-	    ),
-	    tags: tag_ctrl.get_all_tags_async(),
-	    all_topics_count: topic_ctrl.get_count_by_query_async({ })
+        topics: topic_ctrl.get_topics_by_query_async({ }, {
+            skip: (page - 1) * limit,
+            limit: limit,
+            sort: [['last_reply_at', 'desc']]
+        }),
+        hot_topics: topic_ctrl.get_topics_by_query_async({ }, {
+            limit: 5,
+            sort: [['visit_count','desc']]
+        }),
+        stars: user_ctrl.get_users_by_query_async(
+            { is_star: true },
+            { limit: 5 }
+        ),
+        tops: user_ctrl.get_users_by_query_async({ }, {
+            limit: 10,
+            sort: [['score','desc']]
+        }),
+        no_reply_topics: topic_ctrl.get_topics_by_query_async(
+            { reply_count: 0 },
+            { limit: 5, sort: [['create_at','desc']] }
+        ),
+        tags: tag_ctrl.get_all_tags_async(),
+        all_topics_count: topic_ctrl.get_count_by_query_async({ })
     }));
 
     data.current_page = page;
-   	data.list_topic_count = limit;
+    data.list_topic_count = limit;
     data.pages = Math.ceil(data.all_topics_count / limit);
 
     // 计算最热标签
@@ -122,7 +122,7 @@ var indexAsync = eval(Jscex.compile("async", function (req, res) {
         .sortBy(function (t) { return -t.create_at.valueOf() })
         .first(5);
 
-	res.render('index', data);
+    res.render('index', data);
 }));
 
 exports.index = Unjscexify.toRequestHandler(indexAsync);
