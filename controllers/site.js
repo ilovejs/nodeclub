@@ -71,3 +71,63 @@ exports.index = function(req,res,next){
 		proxy.trigger('pages',pages);
 	});
 };
+
+/********** Jscex ************/
+var Jscex = require("../libs/jscex").Jscex;
+var Unjscexify = Jscex.Unjscexify;
+var _ = require("underscore");
+
+var indexAsync = eval(Jscex.compile("async", function (req, res) {
+    var page = Number(req.query.page) || 1;
+    var limit = config.list_topic_count;
+
+    var data = {
+    	current_page: page,
+    	list_topic_count: limit
+    };
+    
+    data.topics = $await(topic_ctrl.get_topics_by_query_async({ }, {
+    	skip: (page - 1) * limit,
+        limit: limit,
+        sort: [['last_reply_at', 'desc']]
+    }));
+    
+    data.hot_topics = $await(topic_ctrl.get_topics_by_query_async({}, {
+        limit: 5,
+        sort: [['visit_count','desc']]
+    }));
+    
+    data.stars = $await(user_ctrl.get_users_by_query_async(
+        { is_star: true },
+        { limit: 5 }
+    ));
+    
+    data.stars = $await(user_ctrl.get_users_by_query_async({}, {
+        limit: 10,
+        sort: [['score','desc']]
+    }));
+    
+    data.no_reply_topics = $await(topic_ctrl.get_topics_by_query_async(
+        { reply_count: 0 },
+        { limit: 5, sort: [['create_at','desc']] }
+    ));
+    
+    var all_topics_count = $await(topic_ctrl.get_count_by_query_async({}));
+    data.pages = Math.ceil(all_topics_count / limit);
+    
+    data.tags = $await(tag_ctrl.get_all_tags_async());
+
+    // 计算最热标签
+    data.hot_tags = _.chain(data.tags)
+        .sortBy(function (t) { return -t.topic_count; })
+        .first(5);
+
+    // 计算最新标签
+    data.recent_tags = _.chain(data.tags)
+        .sortBy(function (t) { return -t.create_at.valueOf() })
+        .first(5);
+
+	res.render('index', data);
+}));
+
+exports.index = Unjscexify.toRequestHandler(indexAsync);
